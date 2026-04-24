@@ -187,5 +187,34 @@
                 .catch(err => console.log('Service Worker registration failed:', err));
         }
     </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // إعادة ربط أزرار مسح الباركود بعد تحميل الصفحة
+        const scanBarcodeBtn = document.getElementById('scanBarcodeBtn');
+        if (scanBarcodeBtn) {
+            scanBarcodeBtn.onclick = function() {
+                if (typeof startBarcodeScanner === 'function') {
+                    startBarcodeScanner('medBarcode');
+                } else {
+                    console.error('startBarcodeScanner function not found');
+                    alert('خطأ: وظيفة مسح الباركود غير متاحة');
+                }
+            };
+        }
+        
+        const scanBarcodeGenBtn = document.getElementById('scanBarcodeGenBtn');
+        if (scanBarcodeGenBtn) {
+            scanBarcodeGenBtn.onclick = function() {
+                if (typeof startBarcodeScanner === 'function') {
+                    startBarcodeScanner('genBarcode');
+                } else {
+                    console.error('startBarcodeScanner function not found');
+                    alert('خطأ: وظيفة مسح الباركود غير متاحة');
+                }
+            };
+        }
+    });
+</script>
 </body>
 </html>
