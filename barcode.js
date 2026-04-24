@@ -194,7 +194,16 @@ async function startBarcodeScanner(targetInputId) {
     const video = document.getElementById('scannerVideo');
     const resultDiv = document.getElementById('scannerResult');
 
-    if (!modal || !video) return;
+    if (!modal) {
+        console.error('barcodeScannerModal not found');
+        alert('خطأ: نافذة مسح الباركود غير موجودة');
+        return;
+    }
+    if (!video) {
+        console.error('scannerVideo not found');
+        alert('خطأ: عنصر الفيديو غير موجود');
+        return;
+    }
 
     stopScannerAndClose();
     modal.style.display = 'flex';
@@ -216,7 +225,7 @@ async function startBarcodeScanner(targetInputId) {
     } catch (err) {
         console.error('Barcode scanner error:', err);
         if (resultDiv) resultDiv.innerHTML = '❌ تعذر فتح الكاميرا. استخدم الإدخال اليدوي.';
-        alert('لا يمكن الوصول إلى الكاميرا. يرجى السماح بالوصول أو استخدام الإدخال اليدوي.');
+        alert('لا يمكن الوصول إلى الكاميرا. يرجى السماح بالوصول أو استخدام الإدخال اليدوي.\n\n' + err.message);
         setTimeout(() => stopScannerAndClose(), 3000);
     }
 }
@@ -261,10 +270,51 @@ async function startScannerForSearch() {
     }
 }
 
+// ربط الأزرار عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
-    const manualBtn = document.getElementById('manualBarcodeBtn');
-    if (manualBtn) {
-        manualBtn.addEventListener('click', () => {
+    // زر مسح الباركود في نموذج إضافة دواء صيدلية
+    const scanBarcodeBtn = document.getElementById('scanBarcodeBtn');
+    if (scanBarcodeBtn) {
+        scanBarcodeBtn.onclick = () => startBarcodeScanner('medBarcode');
+        console.log('scanBarcodeBtn connected');
+    } else {
+        console.warn('scanBarcodeBtn not found');
+    }
+    
+    // زر مسح الباركود في نموذج إضافة دواء عام
+    const scanBarcodeGenBtn = document.getElementById('scanBarcodeGenBtn');
+    if (scanBarcodeGenBtn) {
+        scanBarcodeGenBtn.onclick = () => startBarcodeScanner('genBarcode');
+        console.log('scanBarcodeGenBtn connected');
+    } else {
+        console.warn('scanBarcodeGenBtn not found');
+    }
+    
+    // زر مسح الباركود في الصفحة الرئيسية
+    const homeBarcodeBtn = document.getElementById('homeBarcodeBtn');
+    if (homeBarcodeBtn) {
+        homeBarcodeBtn.onclick = () => startScannerForSearch();
+        console.log('homeBarcodeBtn connected');
+    }
+    
+    // زر مسح الباركود في صفحة البحث
+    const barcodeSearchBtn = document.getElementById('barcodeSearchBtn');
+    if (barcodeSearchBtn) {
+        barcodeSearchBtn.onclick = () => startScannerForSearch();
+        console.log('barcodeSearchBtn connected');
+    }
+    
+    // أزرار إغلاق المودال
+    const closeScannerModal = document.getElementById('closeScannerModal');
+    if (closeScannerModal) closeScannerModal.onclick = stopScannerAndClose;
+    
+    const cancelScannerBtn = document.getElementById('cancelScannerBtn');
+    if (cancelScannerBtn) cancelScannerBtn.onclick = stopScannerAndClose;
+    
+    // زر الإدخال اليدوي
+    const manualBarcodeBtn = document.getElementById('manualBarcodeBtn');
+    if (manualBarcodeBtn) {
+        manualBarcodeBtn.onclick = () => {
             const barcode = prompt('أدخل الباركود يدويًا:');
             if (barcode && barcode.trim()) {
                 if (currentTargetInputId) {
@@ -286,15 +336,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
-        });
+        };
     }
-
-    const closeScannerModal = document.getElementById('closeScannerModal');
-    if (closeScannerModal) closeScannerModal.addEventListener('click', stopScannerAndClose);
-    const cancelScannerBtn = document.getElementById('cancelScannerBtn');
-    if (cancelScannerBtn) cancelScannerBtn.addEventListener('click', stopScannerAndClose);
 });
 
+// Export functions
 window.startBarcodeScanner = startBarcodeScanner;
 window.startScannerForSearch = startScannerForSearch;
 window.stopScannerAndClose = stopScannerAndClose;
